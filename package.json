@@ -1,0 +1,40 @@
+{
+  "name": "brain",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "check:types": "tsc --noEmit",
+    "check:code": "eslint",
+    "check:code:all": "npm run check:code \".\"",
+    "fix:code": "npm run check:code --fix",
+    "fix:code:all": "npm run fix:code \".\"",
+    "check:formatting": "prettier --check",
+    "check:formatting:all": "npm run check:formatting \"**/*.{ts,js,md,yml,json}\"",
+    "fix:formatting": "prettier --write",
+    "fix:formatting:all": "npm run fix:formatting \"**/*.{ts,js,md,yml,json}\"",
+    "pre-commit": "lint-staged",
+    "postinstall": "husky",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.8.1",
+    "@eslint/js": "^10.0.1",
+    "@vitest/eslint-plugin": "^1.6.27",
+    "eslint": "^10.11.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import-x": "^4.17.1",
+    "eslint-plugin-prettier": "^5.5.6",
+    "glob": "^13.0.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.9",
+    "typescript": "^6.0.2",
+    "typescript-eslint": "^8.71.0",
+    "vitest": "^5.0.3"
+  }
+}

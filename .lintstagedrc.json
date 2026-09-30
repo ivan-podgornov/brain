@@ -1,0 +1,4 @@
+{
+  "*.{ts,js,tsx,jsx}": "npm run fix:code",
+  "*.{ts,js,yml,yaml,json,md}": "npm run fix:formatting"
+}
