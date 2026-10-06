@@ -12,8 +12,8 @@ export function primitive(name: string): PrimitiveTask<TestState> {
     name,
     applyEffects: (state) => ({ ...state, canExecute: true }),
     canExecute: (state) => state.canExecute,
-    start: () => 'pending',
-    update: () => 'pending',
+    start: () => 'running',
+    update: () => 'running',
     stop: () => {},
   };
 }
