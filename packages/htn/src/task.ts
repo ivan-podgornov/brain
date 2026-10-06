@@ -1,5 +1,5 @@
-/** Статус выполнения задачи */
-export type TaskStatus = 'success' | 'pending' | 'failed' | 'stopped';
+/** Результат выполнения задачи */
+export type TaskResult = 'success' | 'running' | 'failed';
 
 export interface PrimitiveTask<TState> {
   /** Название задачи. Используется для отладки и логгирования */
@@ -15,10 +15,10 @@ export interface PrimitiveTask<TState> {
   applyEffects(state: TState): TState;
 
   /** Начинает выполнение задачи */
-  start(state: TState): TaskStatus;
+  start(state: TState): TaskResult;
 
   /** Вызывается каждый тик с обновлённым состоянием мира */
-  update(state: TState): TaskStatus;
+  update(state: TState): TaskResult;
 
   /** Прекращает выполение задачи. Вызывается, когда нужно завершить задачу извне */
   stop(): void;
