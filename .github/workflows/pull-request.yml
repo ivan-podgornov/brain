@@ -17,10 +17,10 @@ jobs:
       - name: Prepare environment
         uses: ./.github/workflows/prepare-environment
       - name: Check types
-        run: npm check:types
+        run: npm run check:types
       - name: Lint
-        run: npm check:code:all
+        run: npm run check:code:all
       - name: Lint formatting
-        run: npm check:formatting:all
+        run: npm run check:formatting:all
       - name: Test
         run: npm test
