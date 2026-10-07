@@ -3,7 +3,18 @@ import type { PrimitiveTask, TaskResult } from './task';
 /** Статус выполнения задачи */
 export type ExecuteStatus = TaskResult | 'idle' | 'stopped';
 
-export class Executor<TState> {
+export interface IExecutor<TState> {
+  /** Обновляет выполнение текущей задачи или, если ранее задачи выполняться не начали, начинает выполнять */
+  update(state: TState): ExecuteStatus;
+
+  /** Останавливает выполнение */
+  stop(): void;
+
+  /** Возвращает задачу, которая выполняется в данный момент */
+  get currentTask(): PrimitiveTask<TState> | null;
+}
+
+export class Executor<TState> implements IExecutor<TState> {
   private currentTaskIndex: number;
   private readonly tasks: readonly PrimitiveTask<TState>[];
   private status: ExecuteStatus;
@@ -26,7 +37,6 @@ export class Executor<TState> {
     this.taskStarted = false;
   }
 
-  /** Возвращает задачу, которая выполняется в данный момент */
   get currentTask(): PrimitiveTask<TState> {
     const task = this.tasks[this.currentTaskIndex];
 
@@ -38,7 +48,6 @@ export class Executor<TState> {
     return task;
   }
 
-  /** Обновляет выполнение текущей задачи */
   update(state: TState): TaskResult {
     if (!this.canTouchTask()) {
       throw new Error(`Can't update, because execution is already ${this.status}`);
@@ -67,7 +76,6 @@ export class Executor<TState> {
     return this.status;
   }
 
-  /** Останавливает выполнение задач */
   stop() {
     if (!this.canTouchTask()) {
       throw new Error(`Can't stop, because execution is already ${this.status}`);

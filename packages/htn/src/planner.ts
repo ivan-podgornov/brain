@@ -1,7 +1,11 @@
 import { isPrimitive } from './task';
 import type { PrimitiveTask, Task } from './task';
 
-export class Planner<TState> {
+export interface IPlanner<TState> {
+  plan(root: Task<TState>, state: TState): PrimitiveTask<TState>[] | null;
+}
+
+export class Planner<TState> implements IPlanner<TState> {
   plan(root: Task<TState>, state: TState): PrimitiveTask<TState>[] | null {
     return this.decompose([root], state);
   }

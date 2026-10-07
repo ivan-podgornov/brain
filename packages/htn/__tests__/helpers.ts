@@ -1,7 +1,9 @@
 import { vi } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import type { CompoundTask, PrimitiveTask, Method, Task } from '../src/task';
+import type { IExecutor } from '../src/executor';
+import type { IPlanner } from '../src/planner';
+import type { CompoundTask, PrimitiveTask, Method, Task, TaskResult } from '../src/task';
 
 export type TestState = { canExecute: boolean; counter: number };
 
@@ -76,4 +78,24 @@ export function spyMethod(
 
 export function getNames(tasks: Task<TestState>[]): string[] {
   return tasks.map((task) => task.name);
+}
+
+export function getDummyPlanner(
+  plan: PrimitiveTask<TestState>[] | null,
+  secondPlan?: PrimitiveTask<TestState>[] | null
+): IPlanner<TestState> {
+  return {
+    plan: vi
+      .fn()
+      .mockReturnValueOnce(plan)
+      .mockReturnValue(typeof secondPlan === 'undefined' ? plan : secondPlan),
+  };
+}
+
+export function getDummyExecutor(taskResult: TaskResult): IExecutor<TestState> {
+  return {
+    currentTask: null,
+    update: vi.fn().mockReturnValue(taskResult),
+    stop: vi.fn().mockReturnValue(taskResult),
+  };
 }
