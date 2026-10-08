@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "packages/*"
+    "toolkit/*",
+    "core/*",
+    "mod/*"
   ],
   "scripts": {
     "check:types": "tsc --noEmit",
@@ -16,6 +18,7 @@
     "check:formatting:all": "npm run check:formatting \"**/*.{ts,js,md,yml,json}\"",
     "fix:formatting": "prettier --write",
     "fix:formatting:all": "npm run fix:formatting \"**/*.{ts,js,md,yml,json}\"",
+    "prepare": "husky",
     "pre-commit": "lint-staged",
     "postinstall": "husky",
     "test": "vitest"

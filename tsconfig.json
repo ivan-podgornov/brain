@@ -19,5 +19,5 @@
     "skipLibCheck": true
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["eslint.config.js", "./packages/**/*"]
+  "include": ["eslint.config.js", "./toolkit/**/*", "./core/**/*", "./mod/**/*"]
 }

@@ -1,5 +1,5 @@
 /node_modules/
-.husky
+.husky/_/
 .DS_Store
 .idea
 .vscode
