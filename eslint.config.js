@@ -9,10 +9,10 @@ import tseslint from 'typescript-eslint';
 
 const devFiles = [
   'eslint.config.js',
-  'packages/**/*.test.{ts,tsx}',
-  'packages/**/*.spec.{ts,tsx}',
-  'packages/**/__tests__/**/*.{ts,tsx}',
-  'packages/**/dev/**/*.{ts,tsx}',
+  '{toolkit,core,mod}/**/*.test.{ts,tsx}',
+  '{toolkit,core,mod}/**/*.spec.{ts,tsx}',
+  '{toolkit,core,mod}/**/__tests__/**/*.{ts,tsx}',
+  '{toolkit,core,mod}/**/dev/**/*.{ts,tsx}',
 ];
 
 export default defineConfig([
