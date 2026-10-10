@@ -47,7 +47,7 @@ describe('EventEmitter', () => {
         expect(failing).toHaveBeenCalledTimes(2);
       });
 
-      it('Передаёт выброшенное исключение в onError', () => {
+      it('Если в конструктор передан onError, передаёт выброшенное исключение в onError', () => {
         const error = new Error('boom');
         const onError = vi.fn();
         const emitter = new EventEmitter<Events>({ onError });
@@ -58,6 +58,15 @@ describe('EventEmitter', () => {
         emitter.dispatchEvent('tick');
 
         expect(onError).toHaveBeenCalledExactlyOnceWith(error);
+      });
+
+      it('Если в конструктор не передан onError, исключение игнорируется', () => {
+        const emitter = new EventEmitter<Events>();
+        emitter.addEventListener('tick', () => {
+          throw new Error('boom');
+        });
+
+        expect(() => emitter.dispatchEvent('tick')).not.toThrow();
       });
 
       it('Если упали несколько обработчиков, передаёт в onError исключение каждого', () => {
@@ -75,6 +84,32 @@ describe('EventEmitter', () => {
         emitter.dispatchEvent('tick');
 
         expect(onError.mock.calls).toEqual([[first], [second]]);
+      });
+
+      it('Если обработчик, переданный в onError выполнится с ошибкой, исключение не выбросится наружу', () => {
+        const onError = vi.fn().mockThrow(new Error());
+        const emitter = new EventEmitter<Events>({ onError });
+        const next = vi.fn();
+        emitter.addEventListener('tick', () => {
+          throw new Error('boom');
+        });
+        emitter.addEventListener('tick', next);
+
+        expect(() => emitter.dispatchEvent('tick')).not.toThrow();
+      });
+
+      it('Если обработчик, переданный в onError выполнится с ошибкой, следующие обработчики продолжат вызываться', () => {
+        const onError = vi.fn().mockThrow(new Error());
+        const emitter = new EventEmitter<Events>({ onError });
+        const next = vi.fn();
+        emitter.addEventListener('tick', () => {
+          throw new Error('boom');
+        });
+        emitter.addEventListener('tick', next);
+
+        emitter.dispatchEvent('tick');
+
+        expect(next).toHaveBeenCalledOnce();
       });
     });
   });
