@@ -4,6 +4,8 @@ export type EventPayload<T> = [T] extends [never] ? [] : [payload: T];
 
 export type Listener<T> = (...payload: EventPayload<T>) => void;
 
+export type ListenerOptions = Record<never, never>;
+
 export interface IEventEmitter<Events extends DefaultEventsRecord> {
   /**
    * Генерирует событие на объекте-эмиттере
