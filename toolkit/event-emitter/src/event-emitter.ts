@@ -1,10 +1,20 @@
 import { Listeners } from './listeners';
-import type { DefaultEventsRecord, EventPayload, IEventEmitter, Listener } from './types';
+import type {
+  DefaultEventsRecord,
+  EventPayload,
+  IEventEmitter,
+  Listener,
+  ListenerOptions,
+} from './types';
 
 type ErrorHandler = (error: unknown) => void;
 
 export type EventEmitterOptions = {
   onError?: ErrorHandler;
+};
+
+const DEFAULT_LISTENER_OPTIONS: ListenerOptions = {
+  once: false,
 };
 
 export class EventEmitter<Events extends DefaultEventsRecord> implements IEventEmitter<Events> {
@@ -16,8 +26,12 @@ export class EventEmitter<Events extends DefaultEventsRecord> implements IEventE
   }
 
   dispatchEvent<K extends keyof Events>(type: K, ...payload: EventPayload<Events[K]>): void {
-    this.listeners.forEach(type, (listener) => {
+    this.listeners.forEach(type, (listener, options) => {
       try {
+        if (options.once) {
+          this.removeEventListener(type, listener);
+        }
+
         listener(...payload);
       } catch (error) {
         try {
@@ -29,8 +43,12 @@ export class EventEmitter<Events extends DefaultEventsRecord> implements IEventE
     });
   }
 
-  addEventListener<K extends keyof Events>(type: K, listener: Listener<Events[K]>): void {
-    this.listeners.add(type, listener);
+  addEventListener<K extends keyof Events>(
+    type: K,
+    listener: Listener<Events[K]>,
+    options: Partial<ListenerOptions> = DEFAULT_LISTENER_OPTIONS
+  ): void {
+    this.listeners.add(type, listener, { ...DEFAULT_LISTENER_OPTIONS, ...options });
   }
 
   removeEventListener<K extends keyof Events>(type: K, listener: Listener<Events[K]>): void {

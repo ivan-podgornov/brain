@@ -1,10 +1,16 @@
-export type DefaultEventsRecord = Record<string, unknown>;
+export type DefaultEventsRecord = object;
 
-export type EventPayload<T> = [T] extends [never] ? [] : [payload: T];
+export type EventPayload<T> = [T] extends [undefined] ? [] : [payload: T];
 
 export type Listener<T> = (...payload: EventPayload<T>) => void;
 
-export type ListenerOptions = Record<never, never>;
+export type ListenerOptions = {
+  /**
+   * Если true, обработчик сработает только раз и будет удалён
+   * @default false
+   */
+  once: boolean;
+};
 
 export interface IEventEmitter<Events extends DefaultEventsRecord> {
   /**
@@ -19,7 +25,11 @@ export interface IEventEmitter<Events extends DefaultEventsRecord> {
    * @param type - название события на которое должен реагировать обработчик
    * @param listener - обработчик (вызывается с теми параметрами с которыми порождается событие)
    */
-  addEventListener<K extends keyof Events>(type: K, listener: Listener<Events[K]>): void;
+  addEventListener<K extends keyof Events>(
+    type: K,
+    listener: Listener<Events[K]>,
+    options?: Partial<ListenerOptions>
+  ): void;
 
   /**
    * Снимает обработчик с объекта-эмиттера. С тех пор как обработчик снят, он не будет вызываться

@@ -1,17 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { EventEmitter } from '../../src/event-emitter';
-
-type Events = {
-  tick: never;
-};
+import type { TestEvents } from '../helpers';
 
 describe('EventEmitter', () => {
   describe('#dispatchEvent', () => {
     describe('При исключении в обработчике', () => {
       it('Не пробрасывает исключение наружу', () => {
         const onError = vi.fn();
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         emitter.addEventListener('tick', () => {
           throw new Error('boom');
         });
@@ -21,7 +18,7 @@ describe('EventEmitter', () => {
 
       it('Вызывает обработчики, назначенные после упавшего', () => {
         const onError = vi.fn();
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         const next = vi.fn();
         emitter.addEventListener('tick', () => {
           throw new Error('boom');
@@ -35,7 +32,7 @@ describe('EventEmitter', () => {
 
       it('Не снимает упавший обработчик, он вызывается при следующем порождении события', () => {
         const onError = vi.fn();
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         const failing = vi.fn(() => {
           throw new Error('boom');
         });
@@ -50,7 +47,7 @@ describe('EventEmitter', () => {
       it('Если в конструктор передан onError, передаёт выброшенное исключение в onError', () => {
         const error = new Error('boom');
         const onError = vi.fn();
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         emitter.addEventListener('tick', () => {
           throw error;
         });
@@ -61,7 +58,7 @@ describe('EventEmitter', () => {
       });
 
       it('Если в конструктор не передан onError, исключение игнорируется', () => {
-        const emitter = new EventEmitter<Events>();
+        const emitter = new EventEmitter<TestEvents>();
         emitter.addEventListener('tick', () => {
           throw new Error('boom');
         });
@@ -73,7 +70,7 @@ describe('EventEmitter', () => {
         const first = new Error('first');
         const second = new Error('second');
         const onError = vi.fn();
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         emitter.addEventListener('tick', () => {
           throw first;
         });
@@ -88,7 +85,7 @@ describe('EventEmitter', () => {
 
       it('Если обработчик, переданный в onError выполнится с ошибкой, исключение не выбросится наружу', () => {
         const onError = vi.fn().mockThrow(new Error());
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         const next = vi.fn();
         emitter.addEventListener('tick', () => {
           throw new Error('boom');
@@ -100,7 +97,7 @@ describe('EventEmitter', () => {
 
       it('Если обработчик, переданный в onError выполнится с ошибкой, следующие обработчики продолжат вызываться', () => {
         const onError = vi.fn().mockThrow(new Error());
-        const emitter = new EventEmitter<Events>({ onError });
+        const emitter = new EventEmitter<TestEvents>({ onError });
         const next = vi.fn();
         emitter.addEventListener('tick', () => {
           throw new Error('boom');

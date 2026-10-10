@@ -1,16 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { EventEmitter } from '../../src/event-emitter';
-
-type Events = {
-  tick: never;
-  update: number;
-};
+import type { TestEvents } from '../helpers';
 
 describe('EventEmitter', () => {
   describe('#dispatchEvent', () => {
     it('Вызывает обработчики, назначенные на событие с указанным названием', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
       emitter.addEventListener('tick', listener);
 
@@ -20,7 +16,7 @@ describe('EventEmitter', () => {
     });
 
     it('Не вызывает обработчики, назначенные на другие события', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
       emitter.addEventListener('update', listener);
 
@@ -30,7 +26,7 @@ describe('EventEmitter', () => {
     });
 
     it('Вызывает обработчик со значением, переданным вторым параметром', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
       emitter.addEventListener('update', listener);
 
@@ -40,7 +36,7 @@ describe('EventEmitter', () => {
     });
 
     it('Вызывает обработчики в порядке их назначения', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const calls: string[] = [];
       emitter.addEventListener('tick', () => calls.push('first'));
       emitter.addEventListener('tick', () => calls.push('second'));
@@ -51,13 +47,13 @@ describe('EventEmitter', () => {
     });
 
     it('Если у события нет обработчиков, не выбрасывает ошибку', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
 
       expect(() => emitter.dispatchEvent('tick')).not.toThrow();
     });
 
     it('Если обработчик назначили уже после порождения события, он не вызывается', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
 
       emitter.dispatchEvent('tick');

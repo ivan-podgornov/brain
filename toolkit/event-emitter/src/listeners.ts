@@ -44,18 +44,20 @@ export class Listeners<Events extends DefaultEventsRecord> {
    * Один и тот же слушатель не может быть назначен дважды
    * @param type - название события для которого нужно добавить слушатель
    * @param listener - собственно слушатель
+   * @param options - дополнительные настройки слушателя
    */
-  add<K extends keyof Events>(type: K, listener: Listener<Events[K]>): void {
+  add<K extends keyof Events>(
+    type: K,
+    listener: Listener<Events[K]>,
+    options: ListenerOptions
+  ): void {
     const eventListeners = this.getOrInsert(type);
 
     if (eventListeners.has(listener)) {
       return;
     }
 
-    eventListeners.set(listener, {
-      actual: true,
-      options: {},
-    });
+    eventListeners.set(listener, { actual: true, options });
   }
 
   /**

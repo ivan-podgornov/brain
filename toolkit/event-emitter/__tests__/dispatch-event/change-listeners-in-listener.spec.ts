@@ -1,17 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { EventEmitter } from '../../src/event-emitter';
-
-type Events = {
-  tick: never;
-  update: number;
-};
+import type { TestEvents } from '../helpers';
 
 describe('EventEmitter', () => {
   describe('#dispatchEvent', () => {
     describe('Изменение обработчиков во время обработки события', () => {
       it('Если обработчик снят другим обработчиком до своей очереди, он не вызывается', () => {
-        const emitter = new EventEmitter<Events>();
+        const emitter = new EventEmitter<TestEvents>();
         const second = vi.fn();
         emitter.addEventListener('tick', () => emitter.removeEventListener('tick', second));
         emitter.addEventListener('tick', second);
@@ -22,7 +18,7 @@ describe('EventEmitter', () => {
       });
 
       it('Если обработчик снят другим обработчиком до своей очереди, остальные вызываются', () => {
-        const emitter = new EventEmitter<Events>();
+        const emitter = new EventEmitter<TestEvents>();
         const second = vi.fn();
         const third = vi.fn();
         emitter.addEventListener('tick', () => emitter.removeEventListener('tick', second));
@@ -35,7 +31,7 @@ describe('EventEmitter', () => {
       });
 
       it('Если обработчик назначен во время порождения события, в текущем порождении он не вызывается', () => {
-        const emitter = new EventEmitter<Events>();
+        const emitter = new EventEmitter<TestEvents>();
         const late = vi.fn();
         emitter.addEventListener('tick', () => emitter.addEventListener('tick', late));
 
@@ -45,7 +41,7 @@ describe('EventEmitter', () => {
       });
 
       it('Если обработчик назначен во время порождения события, при следующем порождении он вызывается', () => {
-        const emitter = new EventEmitter<Events>();
+        const emitter = new EventEmitter<TestEvents>();
         const late = vi.fn();
         emitter.addEventListener('tick', () => emitter.addEventListener('tick', late));
 
@@ -53,6 +49,23 @@ describe('EventEmitter', () => {
         emitter.dispatchEvent('tick');
 
         expect(late).toHaveBeenCalledOnce();
+      });
+
+      it('Если событие порождается изнутри обработчика с once: true, он не вызывается повторно', () => {
+        const emitter = new EventEmitter<TestEvents>();
+        let calls = 0;
+        function listener() {
+          calls += 1;
+
+          if (calls < 5) {
+            emitter.dispatchEvent('tick');
+          }
+        }
+        emitter.addEventListener('tick', listener, { once: true });
+
+        emitter.dispatchEvent('tick');
+
+        expect(calls).toBe(1);
       });
     });
   });

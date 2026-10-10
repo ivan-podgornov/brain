@@ -2,26 +2,26 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { EventEmitter } from '../src/event-emitter';
 
-type Events = {
-  tick: never;
-  update: number;
-};
+import { optionsCases, type TestEvents } from './helpers';
 
 describe('EventEmitter', () => {
   describe('#removeEventListener', () => {
-    it('Снимает обработчик, и при следующем порождении события он не вызывается', () => {
-      const emitter = new EventEmitter<Events>();
-      const listener = vi.fn();
-      emitter.addEventListener('tick', listener);
+    it.each(optionsCases)(
+      'Если обработчик назначен с опциями: $name, снимает его, и при следующем порождении события он не вызывается',
+      ({ options }) => {
+        const emitter = new EventEmitter<TestEvents>();
+        const listener = vi.fn();
+        emitter.addEventListener('tick', listener, options);
 
-      emitter.removeEventListener('tick', listener);
-      emitter.dispatchEvent('tick');
+        emitter.removeEventListener('tick', listener);
+        emitter.dispatchEvent('tick');
 
-      expect(listener).not.toHaveBeenCalled();
-    });
+        expect(listener).not.toHaveBeenCalled();
+      }
+    );
 
     it('После снятия обработчика остальные обработчики события продолжают вызываться', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const removed = vi.fn();
       const remaining = vi.fn();
       emitter.addEventListener('tick', removed);
@@ -34,7 +34,7 @@ describe('EventEmitter', () => {
     });
 
     it('Снимает обработчик только с указанного события', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
       emitter.addEventListener('tick', listener);
       emitter.addEventListener('update', listener);
@@ -46,7 +46,7 @@ describe('EventEmitter', () => {
     });
 
     it('Если одну функцию назначили на событие дважды, один вызов снимает её полностью', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
       emitter.addEventListener('tick', listener);
       emitter.addEventListener('tick', listener);
@@ -58,7 +58,7 @@ describe('EventEmitter', () => {
     });
 
     it('Если снять обработчик дважды, не выбрасывает ошибку', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const listener = vi.fn();
       emitter.addEventListener('tick', listener);
       emitter.removeEventListener('tick', listener);
@@ -67,13 +67,13 @@ describe('EventEmitter', () => {
     });
 
     it('Если у события нет обработчиков, не выбрасывает ошибку', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
 
       expect(() => emitter.removeEventListener('tick', vi.fn())).not.toThrow();
     });
 
     it('Если обработчик не назначали, не снимает остальные', () => {
-      const emitter = new EventEmitter<Events>();
+      const emitter = new EventEmitter<TestEvents>();
       const assigned = vi.fn();
       emitter.addEventListener('tick', assigned);
 
