@@ -1,4 +1,4 @@
-export type DefaultEventsRecord = object;
+export type DefaultEvents = object;
 
 export type EventPayload<T> = [T] extends [undefined] ? [] : [payload: T];
 
@@ -9,10 +9,10 @@ export type ListenerOptions = {
    * Если true, обработчик сработает только раз и будет удалён
    * @default false
    */
-  once: boolean;
+  once?: boolean;
 };
 
-export interface IEventEmitter<Events extends DefaultEventsRecord> {
+export interface IEventEmitter<Events extends DefaultEvents> {
   /**
    * Генерирует событие на объекте-эмиттере
    * @param type - название события
@@ -28,7 +28,7 @@ export interface IEventEmitter<Events extends DefaultEventsRecord> {
   addEventListener<K extends keyof Events>(
     type: K,
     listener: Listener<Events[K]>,
-    options?: Partial<ListenerOptions>
+    options?: ListenerOptions
   ): void;
 
   /**

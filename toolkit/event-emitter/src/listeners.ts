@@ -1,4 +1,4 @@
-import type { DefaultEventsRecord, Listener, ListenerOptions } from './types';
+import type { DefaultEvents, Listener, ListenerOptions } from './types';
 
 type ListenerDetails = {
   /**
@@ -19,14 +19,14 @@ type ListenerDetails = {
 
 // Map в котором слушателю события соответствует информация о слушателе:
 // должен ли он вызваться только раз, должен ли он быть удалён и т.д
-type EventListeners<Events extends DefaultEventsRecord, K extends keyof Events> = Map<
+type EventListeners<Events extends DefaultEvents, K extends keyof Events> = Map<
   Listener<Events[K]>,
   ListenerDetails
 >;
 
-type EventListenerVisitor<Events extends DefaultEventsRecord, K extends keyof Events> = (
+type EventListenerVisitor<Events extends DefaultEvents, K extends keyof Events> = (
   listener: Listener<Events[K]>,
-  details: ListenerOptions
+  options: ListenerOptions
 ) => void;
 
 /**
@@ -35,7 +35,7 @@ type EventListenerVisitor<Events extends DefaultEventsRecord, K extends keyof Ev
  * событий, удалять их и перебирать. Но, пользователя не должно волновать как события хранятся:
  * с помощью Map, массивов, Set или обычных объектов.
  */
-export class Listeners<Events extends DefaultEventsRecord> {
+export class Listeners<Events extends DefaultEvents> {
   private readonly listeners = new Map<keyof Events, EventListeners<Events, keyof Events>>();
 
   /**

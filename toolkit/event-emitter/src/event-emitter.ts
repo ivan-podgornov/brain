@@ -1,6 +1,6 @@
 import { Listeners } from './listeners';
 import type {
-  DefaultEventsRecord,
+  DefaultEvents,
   EventPayload,
   IEventEmitter,
   Listener,
@@ -17,7 +17,7 @@ const DEFAULT_LISTENER_OPTIONS: ListenerOptions = {
   once: false,
 };
 
-export class EventEmitter<Events extends DefaultEventsRecord> implements IEventEmitter<Events> {
+export class EventEmitter<Events extends DefaultEvents> implements IEventEmitter<Events> {
   private readonly listeners: Listeners<Events> = new Listeners();
   private readonly onError: ErrorHandler;
 
@@ -46,7 +46,7 @@ export class EventEmitter<Events extends DefaultEventsRecord> implements IEventE
   addEventListener<K extends keyof Events>(
     type: K,
     listener: Listener<Events[K]>,
-    options: Partial<ListenerOptions> = DEFAULT_LISTENER_OPTIONS
+    options: ListenerOptions = DEFAULT_LISTENER_OPTIONS
   ): void {
     this.listeners.add(type, listener, { ...DEFAULT_LISTENER_OPTIONS, ...options });
   }
