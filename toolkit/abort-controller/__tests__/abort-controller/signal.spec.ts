@@ -1,13 +1,30 @@
-import { describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
+import { AbortController } from '../../src/abort-controller';
 
 describe('AbortController', () => {
   describe('#signal', () => {
-    it.todo('При создании контроллера, сигнал находится в состоянии pending');
+    it('При создании контроллера, сигнал находится в состоянии pending', () => {
+      const controller = new AbortController();
 
-    it.todo('После вызова controller.abort, переходит в состояние aborted');
+      expect(controller.signal.aborted).toBe(false);
+    });
 
-    it.todo(
-      'При переходе из состояния pending в aborted, указывает на тот же экземпляр AbortSignal'
-    );
+    it('После вызова controller.abort, переходит в состояние aborted', () => {
+      const controller = new AbortController();
+
+      controller.abort();
+
+      expect(controller.signal.aborted).toBe(true);
+    });
+
+    it('При переходе из состояния pending в aborted, указывает на тот же экземпляр AbortSignal', () => {
+      const controller = new AbortController();
+      const signal = controller.signal;
+
+      controller.abort();
+
+      expect(controller.signal).toBe(signal);
+    });
   });
 });

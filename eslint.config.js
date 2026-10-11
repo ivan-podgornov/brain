@@ -83,7 +83,7 @@ export default defineConfig([
         {
           devDependencies: devFiles,
           peerDependencies: true,
-          packageDir: ['./', ...globSync('./packages/*')],
+          packageDir: ['./', ...globSync(['./toolkit/*', './core/*', './mod/*'])],
         },
       ],
     },
