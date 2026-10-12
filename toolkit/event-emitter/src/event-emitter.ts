@@ -48,6 +48,16 @@ export class EventEmitter<Events extends DefaultEvents> implements IEventEmitter
     listener: Listener<Events[K]>,
     options: ListenerOptions = DEFAULT_LISTENER_OPTIONS
   ): void {
+    if (options.signal) {
+      if (options.signal.aborted) {
+        return;
+      }
+
+      options.signal.addEventListener('abort', () => this.removeEventListener(type, listener), {
+        once: true,
+      });
+    }
+
     this.listeners.add(type, listener, { ...DEFAULT_LISTENER_OPTIONS, ...options });
   }
 

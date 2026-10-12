@@ -75,6 +75,8 @@ emitter.dispatchEvent('npcMoved', { id: 1, x: 10, y: 20 });
 
 ## Снятие обработчиков
 
+### removeEventListener
+
 Чтобы снять обработчик, `removeEventListener` нужно передать ту же функцию, что и при назначении.
 Поэтому, если обработчик придётся снимать, сохраните его в переменную или объявите функцией.
 Анонимную стрелочную функцию снять не получится:
@@ -88,6 +90,19 @@ emitter.removeEventListener('tick', onTick); // можно
 ```
 
 Если обработчика нет, `removeEventListener` ничего не делает и не выбрасывает ошибок.
+
+### Параметр signal
+
+Ещё один способ снять сигнал - передать в addEventListener опцию `signal` со значением AbortSignal.
+Если такой сигнал перейдёт в состояние aborted, обработчик будет снят:
+
+```ts
+const controller = new AbortController();
+emitter.addEventListener('tick', onTick, { signal: controller.signal });
+controller.abort(); // обработчик снят и больше не будет вызван
+```
+
+Если обработчик уже был снят другим способом, вызов `abort` ни на что не повлияет.
 
 ## Обработчик на один раз
 
