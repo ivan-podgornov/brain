@@ -4,12 +4,23 @@ export type EventPayload<T> = [T] extends [undefined] ? [] : [payload: T];
 
 export type Listener<T> = (...payload: EventPayload<T>) => void;
 
+export interface IAbortSignal extends IEventEmitter<{ abort?: unknown }> {
+  aborted: boolean;
+}
+
 export type ListenerOptions = {
   /**
    * Если true, обработчик сработает только раз и будет удалён
    * @default false
    */
   once?: boolean;
+
+  /**
+   * При переходе сигнала в состояние aborted, слушатель события будет удалён.
+   * Если сигнал не указан, то никакой сигнал по умолчанию использоваться не будет.
+   * @default undefined
+   */
+  signal?: IAbortSignal;
 };
 
 export interface IEventEmitter<Events extends DefaultEvents> {
