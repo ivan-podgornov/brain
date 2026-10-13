@@ -1,4 +1,4 @@
-import type { Listener } from '../event-target';
+import type { Listener, IEventTarget } from '../event-target';
 
 export type AbortSignalEvents = {
   abort?: unknown;
@@ -10,9 +10,11 @@ export type AbortListener = Listener<AbortSignalEvents['abort']>;
 
 export type AbortSignalExecutor = (abort: Abort) => void;
 
-export interface IAbortSignalState {
+export interface IAbortSignal extends IEventTarget<AbortSignalEvents> {
   readonly aborted: boolean;
   readonly reason: unknown;
 
   throwIfAborted(): void;
 }
+
+export type IAbortSignalState = Pick<IAbortSignal, 'aborted' | 'reason' | 'throwIfAborted'>;

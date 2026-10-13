@@ -7,10 +7,11 @@ import type {
   AbortListener,
   AbortSignalExecutor,
   AbortSignalEvents,
+  IAbortSignal,
   IAbortSignalState,
 } from './types';
 
-export class AbortSignal extends EventTarget<AbortSignalEvents> {
+export class AbortSignal extends EventTarget<AbortSignalEvents> implements IAbortSignal {
   private state: IAbortSignalState;
 
   /** Используется в качестве обработчика события abort. Вызывается, при переходе в состояние aborted */
