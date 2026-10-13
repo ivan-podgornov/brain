@@ -1,81 +1,40 @@
-# AbortController и AbortSignal
+# AbortController
 
-`AbortController` и `AbortSignal` с тем же API, что и в браузере. Позволяют сообщить асинхронной
-операции, что её нужно прервать, и узнать об этом на стороне операции.
+Позволяет прервать асинхронную операцию. Контроллер создаёт [`AbortSignal`](./abort-signal.md)
+и переводит его в состояние `aborted`. Сигнал передаётся операции, а контроллер остаётся у того,
+кто решает, когда отменять. Так операция может узнать об отмене, но не может отменить сама.
 
 ## Быстрый старт
 
-Контроллер создаёт сигнал и умеет его прерывать. Сигнал передаётся туда, где нужно знать об отмене.
-
 ```ts
-import { AbortController, AbortSignal } from '@brain/events';
-
-function doWork(signal: AbortSignal) {
-  if (signal.aborted) {
-    return;
-  }
-
-  signal.addEventListener('abort', (reason) => {
-    console.log('Работа прервана:', reason);
-  });
-}
+import { AbortController } from '@brain/events';
 
 const controller = new AbortController();
+
 doWork(controller.signal);
 
 controller.abort('Больше не нужно');
 ```
 
-`controller.signal` всегда один и тот же объект, поэтому тот, кто получил сигнал до вызова `abort`,
-узнает об отмене.
+## signal
 
-## Состояния сигнала
+Сигнал, которым управляет контроллер. Это всегда один и тот же объект, поэтому тот, кто получил
+сигнал до вызова `abort`, узнает об отмене.
 
-Сигнал находится в одном из двух состояний:
+## abort
 
-- `pending` — отмены ещё не было. `aborted` равно `false`, `reason` равно `undefined`.
-- `aborted` — сигнал прерван. `aborted` равно `true`, в `reason` лежит причина.
-
-Переход из `pending` в `aborted` один и необратимый. Повторный `controller.abort()` ничего не
-делает: причина не меняется, событие повторно не срабатывает.
-
-## Реакция на отмену
-
-Есть три способа узнать, что сигнал прерван.
-
-**Проверить состояние.** Подходит для проверки перед началом работы или между её шагами:
+Переводит сигнал в состояние `aborted`. Принимает причину отмены, которая попадает в `signal.reason`
 
 ```ts
-if (signal.aborted) {
-  return;
-}
+const controller = new AbortController();
+
+controller.abort('Отмена пользователем');
+
+controller.signal.aborted; // true
+controller.signal.reason; // 'Отмена пользователем'
 ```
 
-**Выбросить причину.** `throwIfAborted` ничего не делает в состоянии `pending` и выбрасывает
-`reason` в состоянии `aborted`:
-
-```ts
-function step(signal: AbortSignal) {
-  signal.throwIfAborted();
-
-  // ...остальная работа
-}
-```
-
-**Подписаться на событие `abort`.** Событие срабатывает один раз при переходе. К моменту вызова
-обработчика `aborted` и `reason` уже выставлены:
-
-```ts
-signal.addEventListener('abort', (reason) => cleanup(reason), { once: true });
-
-// или через свойство
-signal.onabort = (reason) => cleanup(reason);
-```
-
-## Причина отмены
-
-Причину можно передать в `abort`. Если её не указать, `reason` будет объектом `Error`
-с именем `AbortError`:
+Если причину не указать, `reason` будет объектом `Error` с именем `AbortError`:
 
 ```ts
 const controller = new AbortController();
@@ -85,62 +44,46 @@ controller.abort();
 controller.signal.reason.name; // 'AbortError'
 ```
 
-## Готовые сигналы
-
-### AbortSignal.abort
-
-Возвращает сигнал, который уже находится в состоянии `aborted`. Событие `abort` на таком сигнале не
-сработает, потому что подписаться раньше перехода невозможно.
-Всегда проверяйте `aborted` до подписки:
+Повторный вызов `abort` ничего не делает: причина не меняется, обработчики повторно не вызываются.
 
 ```ts
-const signal = AbortSignal.abort('Уже отменено');
+const controller = new AbortController();
 
-signal.aborted; // true
-signal.reason; // 'Уже отменено'
+controller.abort('Первая причина');
+controller.abort('Вторая причина');
+
+controller.signal.reason; // 'Первая причина'
 ```
 
-### AbortSignal.timeout
+## Примеры
 
-Возвращает сигнал, который прерывается через указанное число миллисекунд. Причиной будет `Error`
-с именем `TimeoutError`:
+### Отмена устаревшей операции
+
+Новый запрос отменяет предыдущий:
 
 ```ts
-const signal = AbortSignal.timeout(5000);
+let controller: AbortController | undefined;
 
-signal.addEventListener('abort', (reason) => {
-  reason.name; // 'TimeoutError'
-});
+function search(query: string) {
+  controller?.abort('Появился новый запрос');
+  controller = new AbortController();
+
+  return fetchResults(query, controller.signal);
+}
 ```
 
-### AbortSignal.any
+### Одна отмена для нескольких операций
 
-Объединяет несколько сигналов. Результат прерывается, как только прервётся любой из них, и берёт
-причину сработавшего. Если один из сигналов уже прерван, результат сразу в состоянии `aborted` с его
-причиной:
+Один сигнал можно передать сколько угодно раз:
 
 ```ts
-const userCancel = new AbortController();
-const signal = AbortSignal.any([userCancel.signal, AbortSignal.timeout(5000)]);
+const controller = new AbortController();
 
-userCancel.abort('Отмена пользователем');
+loadProfile(controller.signal);
+loadSettings(controller.signal);
 
-signal.reason; // 'Отмена пользователем'
+controller.abort('Пользователь вышел');
 ```
 
-## Собственный сигнал
-
-Конструктор `AbortSignal` принимает функцию-исполнитель (как конструктор промиса). Она получает
-функцию `abort`, которая переводит сигнал в состояние `aborted`. Так можно привязать сигнал к любому
-источнику отмены:
-
-```ts
-const signal = new AbortSignal((abort) => {
-  connection.onclose = () => abort('Соединение закрыто');
-});
-```
-
-## Отличия от браузерного API
-
-- Обработчик события `abort` получает причину (`reason`), а не объект `Event`.
-- `AbortSignal.any` принимает массив, а не произвольный iterable.
+Чтобы отмена могла произойти ещё и по таймауту, объедините сигналы через
+[`AbortSignal.any`](./abort-signal.md#abortsignalany).
