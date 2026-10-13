@@ -1,4 +1,4 @@
-# @brain/abort-controller
+# AbortController и AbortSignal
 
 `AbortController` и `AbortSignal` с тем же API, что и в браузере. Позволяют сообщить асинхронной
 операции, что её нужно прервать, и узнать об этом на стороне операции.
@@ -8,7 +8,7 @@
 Контроллер создаёт сигнал и умеет его прерывать. Сигнал передаётся туда, где нужно знать об отмене.
 
 ```ts
-import { AbortController, AbortSignal } from '@brain/abort-controller';
+import { AbortController, AbortSignal } from '@brain/events';
 
 function doWork(signal: AbortSignal) {
   if (signal.aborted) {

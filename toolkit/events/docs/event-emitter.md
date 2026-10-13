@@ -1,4 +1,4 @@
-# @brain/event-emitter
+# EventEmitter
 
 Типизированный эмиттер событий. Если вы работали с `EventTarget` в браузере, API покажется знакомым:
 `addEventListener`, `removeEventListener`, `dispatchEvent`. Главное отличие в том, что названия
@@ -9,7 +9,7 @@
 Сначала опишите события: ключ - название события, значение - тип данных, которые с ним передаются.
 
 ```ts
-import { EventEmitter } from '@brain/event-emitter';
+import { EventEmitter } from '@brain/events';
 
 type Events = {
   npcDied: number;

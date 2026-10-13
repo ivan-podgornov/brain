@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { EventEmitter } from '../../../src';
+import { EventEmitter } from '../../../src/event-emitter';
 import { optionsCases, type TestEvents } from '../helpers';
 
 describe('EventEmitter', () => {
