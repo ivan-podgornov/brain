@@ -1,4 +1,4 @@
-import { EventEmitter } from '@brain/events';
+import { EventEmitter } from '../event-emitter';
 
 import { AbortedState } from './states/aborted';
 import { PendingState } from './states/pending';

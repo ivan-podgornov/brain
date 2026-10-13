@@ -1,6 +1,5 @@
-import { AbortSignal } from './abort-signal';
-
-import type { Abort } from './types';
+import { AbortSignal } from '../abort-signal';
+import type { Abort } from '../abort-signal';
 
 export class AbortController {
   readonly signal: AbortSignal;

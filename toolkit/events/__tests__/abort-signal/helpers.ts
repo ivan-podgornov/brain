@@ -1,5 +1,5 @@
-import { AbortSignal } from '../src/abort-signal';
-import type { AbortListener, AbortSignalExecutor } from '../src/types';
+import { AbortSignal } from '../../src/abort-signal';
+import type { AbortListener, AbortSignalExecutor } from '../../src/abort-signal';
 
 /**
  * Возвращает executor сигнала, который сразу переводит сигнал в состояние aborted

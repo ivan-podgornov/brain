@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { AbortController } from '../../src/abort-controller';
 import { AbortSignal } from '../../src/abort-signal';
-import { alwaysPendingSignalExecutor, immediatelyAbortedSignalExecutor } from '../helpers';
+
+import { alwaysPendingSignalExecutor, immediatelyAbortedSignalExecutor } from './helpers';
 
 describe('AbortSignal.any', () => {
   it('Если хотя бы один из сигналов-источников в состоянии aborted, возвращает сигнал в состоянии aborted', () => {

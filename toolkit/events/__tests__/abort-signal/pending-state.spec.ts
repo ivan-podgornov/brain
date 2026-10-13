@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import { AbortSignal } from '../../src/abort-signal';
-import { alwaysPendingSignalExecutor } from '../helpers';
+
+import { alwaysPendingSignalExecutor } from './helpers';
 
 describe('AbortSignal', () => {
   describe('При состоянии pending', () => {
