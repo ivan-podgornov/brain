@@ -1,4 +1,4 @@
-import type { Listener } from '@brain/event-emitter';
+import type { Listener } from '@brain/events';
 
 export type AbortSignalEvents = {
   abort?: unknown;

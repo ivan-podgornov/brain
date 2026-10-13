@@ -5,6 +5,6 @@
   "type": "module",
   "main": "./src/index.ts",
   "dependencies": {
-    "@brain/event-emitter": "^0.0.0"
+    "@brain/events": "^0.0.0"
   }
 }

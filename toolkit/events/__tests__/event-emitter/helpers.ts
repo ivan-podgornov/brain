@@ -1,5 +1,5 @@
-import { EventEmitter } from '../src/event-emitter';
-import type { IAbortSignal } from '../src/types';
+import { EventEmitter } from '../../src';
+import type { IAbortSignal } from '../../src/event-emitter/types';
 
 export const optionsCases = [
   { name: 'без опций', options: undefined },
