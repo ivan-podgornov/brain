@@ -1,4 +1,4 @@
-# EventEmitter
+# EventTarget
 
 Типизированный эмиттер событий. Если вы работали с `EventTarget` в браузере, API покажется знакомым:
 `addEventListener`, `removeEventListener`, `dispatchEvent`. Главное отличие в том, что названия
@@ -9,13 +9,13 @@
 Сначала опишите события: ключ - название события, значение - тип данных, которые с ним передаются.
 
 ```ts
-import { EventEmitter } from '@brain/events';
+import { EventTarget } from '@brain/events';
 
 type Events = {
   npcDied: number;
 };
 
-const emitter = new EventEmitter<Events>();
+const target = new EventTarget<Events>();
 ```
 
 Назначьте обработчик и породите событие:
@@ -25,14 +25,14 @@ function onNpcDied(id: number) {
   console.log(`NPC ${id} умер`);
 }
 
-emitter.addEventListener('npcDied', onNpcDied);
-emitter.dispatchEvent('npcDied', 42); // NPC 42 умер
+target.addEventListener('npcDied', onNpcDied);
+target.dispatchEvent('npcDied', 42); // NPC 42 умер
 ```
 
 Когда обработчик больше не нужен, снимите его:
 
 ```ts
-emitter.removeEventListener('npcDied', onNpcDied);
+target.removeEventListener('npcDied', onNpcDied);
 ```
 
 Компилятор проверит и название события, и тип данных.
@@ -47,8 +47,8 @@ type Events = {
   npcDied: number;
 };
 
-emitter.dispatchEvent('npcDied', 42); // ok
-emitter.dispatchEvent('npcDied'); // ошибка: данные обязательны
+target.dispatchEvent('npcDied', 42); // ok
+target.dispatchEvent('npcDied'); // ошибка: данные обязательны
 ```
 
 Если данных нет, укажите `undefined`.
@@ -59,8 +59,8 @@ type Events = {
   tick: undefined;
 };
 
-emitter.addEventListener('tick', () => console.log('тик'));
-emitter.dispatchEvent('tick');
+target.addEventListener('tick', () => console.log('тик'));
+target.dispatchEvent('tick');
 ```
 
 Чтобы передать несколько значений, объедините их в объект:
@@ -70,7 +70,7 @@ type Events = {
   npcMoved: { id: number; x: number; y: number };
 };
 
-emitter.dispatchEvent('npcMoved', { id: 1, x: 10, y: 20 });
+target.dispatchEvent('npcMoved', { id: 1, x: 10, y: 20 });
 ```
 
 ## Снятие обработчиков
@@ -82,11 +82,11 @@ emitter.dispatchEvent('npcMoved', { id: 1, x: 10, y: 20 });
 Анонимную стрелочную функцию снять не получится:
 
 ```ts
-emitter.addEventListener('tick', () => console.log('тик')); // снять нельзя
+target.addEventListener('tick', () => console.log('тик')); // снять нельзя
 
 const onTick = () => console.log('тик');
-emitter.addEventListener('tick', onTick);
-emitter.removeEventListener('tick', onTick); // можно
+target.addEventListener('tick', onTick);
+target.removeEventListener('tick', onTick); // можно
 ```
 
 Если обработчика нет, `removeEventListener` ничего не делает и не выбрасывает ошибок.
@@ -98,7 +98,7 @@ emitter.removeEventListener('tick', onTick); // можно
 
 ```ts
 const controller = new AbortController();
-emitter.addEventListener('tick', onTick, { signal: controller.signal });
+target.addEventListener('tick', onTick, { signal: controller.signal });
 controller.abort(); // обработчик снят и больше не будет вызван
 ```
 
@@ -110,10 +110,10 @@ controller.abort(); // обработчик снят и больше не буд
 он сработает при ближайшем порождении события и после этого снимется сам.
 
 ```ts
-emitter.addEventListener('npcDied', onNpcDied, { once: true });
+target.addEventListener('npcDied', onNpcDied, { once: true });
 
-emitter.dispatchEvent('npcDied', 1); // NPC 1 умер
-emitter.dispatchEvent('npcDied', 2); // ничего не произойдёт
+target.dispatchEvent('npcDied', 1); // NPC 1 умер
+target.dispatchEvent('npcDied', 2); // ничего не произойдёт
 ```
 
 Такой обработчик снимается до вызова, а не после. Поэтому, если внутри него снова породить то же
@@ -123,9 +123,9 @@ emitter.dispatchEvent('npcDied', 2); // ничего не произойдёт
 и той же функцией:
 
 ```ts
-emitter.addEventListener('npcDied', onNpcDied, { once: true });
-emitter.removeEventListener('npcDied', onNpcDied);
-emitter.dispatchEvent('npcDied', 1); // ничего не произойдёт
+target.addEventListener('npcDied', onNpcDied, { once: true });
+target.removeEventListener('npcDied', onNpcDied);
+target.dispatchEvent('npcDied', 1); // ничего не произойдёт
 ```
 
 ## Повторное назначение
@@ -134,22 +134,22 @@ emitter.dispatchEvent('npcDied', 1); // ничего не произойдёт
 событие второй раз, второе назначение будет проигнорировано:
 
 ```ts
-emitter.addEventListener('tick', onTick);
-emitter.addEventListener('tick', onTick);
+target.addEventListener('tick', onTick);
+target.addEventListener('tick', onTick);
 
-emitter.dispatchEvent('tick'); // onTick вызовется один раз
-emitter.removeEventListener('tick', onTick); // и одного снятия достаточно
+target.dispatchEvent('tick'); // onTick вызовется один раз
+target.removeEventListener('tick', onTick); // и одного снятия достаточно
 ```
 
 Опции в эту пару не входят. Если функция уже назначена, то повторное назначение с другими опциями
 ничего не изменит, и останутся опции первого назначения:
 
 ```ts
-emitter.addEventListener('tick', onTick); // обычный обработчик
-emitter.addEventListener('tick', onTick, { once: true }); // игнорируется
+target.addEventListener('tick', onTick); // обычный обработчик
+target.addEventListener('tick', onTick, { once: true }); // игнорируется
 
-emitter.dispatchEvent('tick');
-emitter.dispatchEvent('tick'); // onTick вызвался оба раза
+target.dispatchEvent('tick');
+target.dispatchEvent('tick'); // onTick вызвался оба раза
 ```
 
 А вот одну и ту же функцию можно назначить на несколько разных событий, и они не влияют друг на
@@ -164,24 +164,24 @@ emitter.dispatchEvent('tick'); // onTick вызвался оба раза
 работать со следующего:
 
 ```ts
-emitter.addEventListener('tick', () => {
-  emitter.addEventListener('tick', onTick);
+target.addEventListener('tick', () => {
+  target.addEventListener('tick', onTick);
 });
 
-emitter.dispatchEvent('tick'); // onTick не вызван
-emitter.dispatchEvent('tick'); // onTick вызван
+target.dispatchEvent('tick'); // onTick не вызван
+target.dispatchEvent('tick'); // onTick вызван
 ```
 
 Обработчик, снятый до того, как до него дошла очередь, не вызывается,
 даже если событие уже порождено:
 
 ```ts
-emitter.addEventListener('tick', () => {
-  emitter.removeEventListener('tick', onTick);
+target.addEventListener('tick', () => {
+  target.removeEventListener('tick', onTick);
 });
-emitter.addEventListener('tick', onTick);
+target.addEventListener('tick', onTick);
 
-emitter.dispatchEvent('tick'); // onTick не вызван
+target.dispatchEvent('tick'); // onTick не вызван
 ```
 
 Обработчики вызываются в том порядке, в котором были назначены.
@@ -197,15 +197,15 @@ emitter.dispatchEvent('tick'); // onTick не вызван
 Чтобы узнать об ошибке, передайте в конструктор функцию `onError`. Она получит выброшенное исключение:
 
 ```ts
-const emitter = new EventEmitter<Events>({
+const target = new EventTarget<Events>({
   onError: (error) => console.error('Ошибка в обработчике', error),
 });
 
-emitter.addEventListener('tick', () => {
+target.addEventListener('tick', () => {
   throw new Error('boom');
 });
 
-emitter.dispatchEvent('tick'); // в консоль попадёт ошибка, исключение наружу не вылетит
+target.dispatchEvent('tick'); // в консоль попадёт ошибка, исключение наружу не вылетит
 ```
 
 Если упало несколько обработчиков, `onError` вызывается для каждого исключения отдельно, в порядке

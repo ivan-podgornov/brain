@@ -1,4 +1,4 @@
-import { EventEmitter } from '../event-emitter';
+import { EventTarget } from '../event-target';
 
 import { AbortedState } from './states/aborted';
 import { PendingState } from './states/pending';
@@ -10,7 +10,7 @@ import type {
   IAbortSignalState,
 } from './types';
 
-export class AbortSignal extends EventEmitter<AbortSignalEvents> {
+export class AbortSignal extends EventTarget<AbortSignalEvents> {
   private state: IAbortSignalState;
 
   /** Используется в качестве обработчика события abort. Вызывается, при переходе в состояние aborted */

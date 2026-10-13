@@ -1,5 +1,5 @@
-import { EventEmitter } from '../../src/event-emitter';
-import type { IAbortSignal } from '../../src/event-emitter/types';
+import { EventTarget } from '../../src/event-target';
+import type { IAbortSignal } from '../../src/event-target/types';
 
 export const optionsCases = [
   { name: 'без опций', options: undefined },
@@ -13,12 +13,12 @@ export type TestEvents = {
 };
 
 export function createMockedAbortSignal(aborted: boolean): IAbortSignal {
-  const emitter = new EventEmitter<{ abort: 'unknown' }>();
+  const target = new EventTarget<{ abort: 'unknown' }>();
 
   return {
     aborted,
-    addEventListener: emitter.addEventListener.bind(emitter),
-    removeEventListener: emitter.removeEventListener.bind(emitter),
-    dispatchEvent: emitter.dispatchEvent.bind(emitter),
+    addEventListener: target.addEventListener.bind(target),
+    removeEventListener: target.removeEventListener.bind(target),
+    dispatchEvent: target.dispatchEvent.bind(target),
   };
 }

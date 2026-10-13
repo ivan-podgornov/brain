@@ -1,4 +1,4 @@
-import type { Listener } from '../event-emitter';
+import type { Listener } from '../event-target';
 
 export type AbortSignalEvents = {
   abort?: unknown;

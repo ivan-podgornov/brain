@@ -4,7 +4,7 @@ export type EventPayload<T> = [T] extends [undefined] ? [] : [payload: T];
 
 export type Listener<T> = (...payload: EventPayload<T>) => void;
 
-export interface IAbortSignal extends IEventEmitter<{ abort?: unknown }> {
+export interface IAbortSignal extends IEventTarget<{ abort?: unknown }> {
   aborted: boolean;
 }
 
@@ -23,7 +23,7 @@ export type ListenerOptions = {
   signal?: IAbortSignal;
 };
 
-export interface IEventEmitter<Events extends DefaultEvents> {
+export interface IEventTarget<Events extends DefaultEvents> {
   /**
    * Генерирует событие на объекте-эмиттере
    * @param type - название события

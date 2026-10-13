@@ -1,15 +1,9 @@
 import { Listeners } from './listeners';
-import type {
-  DefaultEvents,
-  EventPayload,
-  IEventEmitter,
-  Listener,
-  ListenerOptions,
-} from './types';
+import type { DefaultEvents, EventPayload, IEventTarget, Listener, ListenerOptions } from './types';
 
 type ErrorHandler = (error: unknown) => void;
 
-export type EventEmitterOptions = {
+export type EventTargetOptions = {
   onError?: ErrorHandler;
 };
 
@@ -17,11 +11,11 @@ const DEFAULT_LISTENER_OPTIONS: ListenerOptions = {
   once: false,
 };
 
-export class EventEmitter<Events extends DefaultEvents> implements IEventEmitter<Events> {
+export class EventTarget<Events extends DefaultEvents> implements IEventTarget<Events> {
   private readonly listeners: Listeners<Events> = new Listeners();
   private readonly onError: ErrorHandler;
 
-  constructor(options: EventEmitterOptions = {}) {
+  constructor(options: EventTargetOptions = {}) {
     this.onError = options.onError ?? (() => {});
   }
 
