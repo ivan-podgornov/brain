@@ -23,7 +23,8 @@ controller.abort('Больше не нужно');
 
 ## abort
 
-Переводит сигнал в состояние `aborted`. Принимает причину отмены, которая попадает в `signal.reason`
+Переводит сигнал в состояние `aborted`.
+Принимает причину отмены, которая попадает в `signal.reason`:
 
 ```ts
 const controller = new AbortController();

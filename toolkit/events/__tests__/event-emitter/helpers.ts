@@ -1,4 +1,4 @@
-import { EventEmitter } from '../../src';
+import { EventEmitter } from '../../src/event-emitter';
 import type { IAbortSignal } from '../../src/event-emitter/types';
 
 export const optionsCases = [
