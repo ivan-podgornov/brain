@@ -71,7 +71,7 @@ export class AbortSignal extends EventTarget<AbortSignalEvents> implements IAbor
    * Возвращает сигнал, который изначально в состоянии aborted
    * @param reason - причина перехода в состояние aborted
    */
-  static abort(reason?: unknown): AbortSignal {
+  static abort(reason?: unknown): IAbortSignal {
     return new AbortSignal((abort) => abort(reason));
   }
 
@@ -80,7 +80,7 @@ export class AbortSignal extends EventTarget<AbortSignalEvents> implements IAbor
    * если хотя бы один из сигналов переходит в это состояние или изначально был в нём.
    * @param signals - список сигналов за которыми нужно следить
    */
-  static any(signals: Array<AbortSignal>): AbortSignal {
+  static any(signals: Array<IAbortSignal>): IAbortSignal {
     const abortedSignal = signals.find((signal) => signal.aborted);
 
     if (abortedSignal) {
@@ -106,7 +106,7 @@ export class AbortSignal extends EventTarget<AbortSignalEvents> implements IAbor
    * когда пройдёт таймаут, указанный в параметре.
    * @param ms - количество миллисекунд, через которое сигнал перейдет в состояние aborted
    */
-  static timeout(ms: number): AbortSignal {
+  static timeout(ms: number): IAbortSignal {
     const reason = new Error('signal timed out');
     reason.name = 'TimeoutError';
 

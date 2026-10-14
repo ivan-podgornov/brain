@@ -58,6 +58,10 @@ export default defineConfig([
           allowAsThisParameter: true,
         },
       ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', ignoreRestSiblings: true },
+      ],
 
       // Core rules
       'func-style': ['error', 'declaration'],
