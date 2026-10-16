@@ -23,7 +23,10 @@ export class Subscriber<T> implements ISubscriber<T> {
 
   constructor(observer?: IObserver<T>, options: SubscriberConstructorOptions = {}) {
     this.onError = options.onError ?? noop;
-    this.observer = this.nornalizeObserver(observer);
+    // normalizeObserver рассчитывает, что на момент его вызова, onError уже добавлен в this.
+    // Так что порядок инициализации onError и observer должны быть именно такими
+    this.observer = this.normalizeObserver(observer);
+
     this.abortController = new AbortController();
     this.teardowns = [];
     this.signal = this.abortController.signal;
@@ -66,10 +69,10 @@ export class Subscriber<T> implements ISubscriber<T> {
   }
 
   /** Приводит переданный observer к одному формату, когда observer является объектом со всеми методами */
-  private nornalizeObserver(observer?: IObserver<T>): NormalizedObserver<T> {
+  private normalizeObserver(observer?: IObserver<T>): NormalizedObserver<T> {
     const defaultObserver: NormalizedObserver<T> = {
       next: noop,
-      error: this.onError.bind(this),
+      error: this.onError,
       complete: noop,
     };
 
@@ -81,7 +84,19 @@ export class Subscriber<T> implements ISubscriber<T> {
       return { ...defaultObserver, next: observer };
     }
 
-    return { ...defaultObserver, ...observer };
+    return {
+      ...defaultObserver,
+      next:
+        typeof observer.next === 'function' ? observer.next.bind(observer) : defaultObserver.next,
+      complete:
+        typeof observer.complete === 'function'
+          ? observer.complete.bind(observer)
+          : defaultObserver.complete,
+      error:
+        typeof observer.error === 'function'
+          ? observer.error.bind(observer)
+          : defaultObserver.error,
+    };
   }
 
   /**
@@ -90,9 +105,13 @@ export class Subscriber<T> implements ISubscriber<T> {
   private listenOuterSignal(signal: IAbortSignal) {
     if (signal.aborted) {
       this.abortController.abort(signal.reason);
+      return;
     }
 
-    signal.addEventListener('abort', (reason) => this.deactivate(noop, reason), { once: true });
+    signal.addEventListener('abort', () => this.deactivate(noop, signal.reason), {
+      once: true,
+      signal: this.signal,
+    });
   }
 
   /** Деактивирует подписку */
@@ -103,6 +122,8 @@ export class Subscriber<T> implements ISubscriber<T> {
 
     this.abortController.abort(reason);
     this.callRegisteredTeardowns();
+    // Очищаем колбэки, чтобы они не висели в памяти
+    this.teardowns.splice(0, this.teardowns.length);
 
     if (callObserver) {
       try {
@@ -115,7 +136,7 @@ export class Subscriber<T> implements ISubscriber<T> {
 
   /** Вызывает все зарегистрированные teardown-колбэки */
   private callRegisteredTeardowns() {
-    this.teardowns.toReversed().forEach(this.callOneTeardown.bind(this));
+    [...this.teardowns].reverse().forEach(this.callOneTeardown.bind(this));
   }
 
   /** Вызывает один конкретный teardown-колбэк */
