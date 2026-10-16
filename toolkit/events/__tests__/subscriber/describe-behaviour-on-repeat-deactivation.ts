@@ -86,9 +86,10 @@ export function describeBehaviorOnRepeatDeactivation(method: DeactivateMethod) {
 
         subscriber.addTeardown(teardown);
         deactivate(subscriber, controller);
+        teardown.mockClear();
         repeatDeactivate(subscriber, controller);
 
-        expect(teardown).toHaveBeenCalledOnce();
+        expect(teardown).not.toHaveBeenCalled();
       });
     }
   );
