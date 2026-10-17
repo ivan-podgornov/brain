@@ -1,3 +1,7 @@
+export { normalizeObserver } from './normalize-observer';
+
+export type { NormalizedObserver } from './normalize-observer';
+
 export { Subscriber } from './subscriber';
 
 export type { SubscriberConstructorOptions } from './subscriber';
