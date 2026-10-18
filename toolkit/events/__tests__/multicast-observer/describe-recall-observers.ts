@@ -7,9 +7,9 @@ import { MulticastObserver } from '../../src/multicast-observer';
 import type { CreateMockedObserverOptions } from './helpers';
 
 import {
+  callMethod,
   createMockedObserver,
   createObserverWithMethod,
-  getArgumentsForMethod,
   getDefaultMulticastOptions,
   getDefaultObserveOptions,
 } from './helpers';
@@ -36,7 +36,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
 
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());
-      multicast[options.method]('any param');
+      callMethod(multicast, method);
 
       expect(firstImplementation).toHaveBeenCalled();
       expect(secondImplementation).toHaveBeenCalled();
@@ -60,12 +60,9 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const methodImplementation = vi.fn();
       const observer = createObserverWithMethod(options, methodImplementation);
       const multicast = new MulticastObserver(getDefaultMulticastOptions());
-      const params = getArgumentsForMethod(method);
 
       multicast.add(observer, getDefaultObserveOptions());
-      // A spread argument must either have a tuple type or be passed to a rest parameter.
-      // @ts-expect-error -- Не понимаю что от меня здесь хочет typescript
-      multicast[method](...params);
+      const params = callMethod(multicast, method);
 
       expect(methodImplementation).toHaveBeenCalledExactlyOnceWith(...params);
     });
@@ -105,7 +102,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       });
 
       firstAbortController.abort();
-      multicast[method]('any param');
+      callMethod(multicast, method);
 
       expect(implementation).toHaveBeenCalledOnce();
     });
@@ -115,32 +112,30 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const methodImplementation = vi.fn();
       const observer = createObserverWithMethod(options, methodImplementation);
       const multicast = new MulticastObserver(getDefaultMulticastOptions());
-      const param = 'any param';
 
       // Нужен второй наблюдатель, который будет держать сигнал MulticastObserver в состоянии pending,
       // А то если он перейдёт в состояние aborted, метод не будет вызываться по этой причине,
       // а не потому что конкретный наблюдатель перешел в состояние aborted
       multicast.add(createMockedObserver(), getDefaultObserveOptions());
       multicast.add(observer, { ...getDefaultObserveOptions(), signal: controller.signal });
-      multicast[method](param);
+      const params = callMethod(multicast, method);
       controller.abort();
-      multicast[method](param);
+      callMethod(multicast, method);
 
-      expect(methodImplementation).toHaveBeenCalledExactlyOnceWith(param);
+      expect(methodImplementation).toHaveBeenCalledExactlyOnceWith(...params);
     });
 
     it(`Если сигнал наблюдателя изначально в состоянии aborted, ${methodName} не вызывается`, () => {
       const methodImplementation = vi.fn();
       const observer = createObserverWithMethod(options, methodImplementation);
       const multicast = new MulticastObserver(getDefaultMulticastOptions());
-      const param = 'any param';
 
       // Нужен второй наблюдатель, который будет держать сигнал MulticastObserver в состоянии pending,
       // А то если он перейдёт в состояние aborted, метод не будет вызываться по этой причине,
       // а не потому что конкретный наблюдатель перешел в состояние aborted
       multicast.add(createMockedObserver(), getDefaultObserveOptions());
       multicast.add(observer, { ...getDefaultObserveOptions(), signal: AbortSignal.abort() });
-      multicast[method](param);
+      callMethod(multicast, method);
 
       expect(methodImplementation).not.toHaveBeenCalled();
     });

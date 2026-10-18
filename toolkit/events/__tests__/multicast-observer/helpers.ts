@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import type { MulticastOptions } from '../../src/multicast-observer';
+import type { MulticastObserver, MulticastOptions } from '../../src/multicast-observer';
 import type { IObserver, IObserverObject, ObserveOptions } from '../../src/subscriber';
 
 export function createMockedObserver() {
@@ -21,6 +21,7 @@ export function getDefaultMulticastOptions(): MulticastOptions {
 
 type Method = 'complete' | 'error' | 'next';
 type MethodImplementation<M extends Method = Method> = Required<IObserverObject<unknown>>[M];
+type MethodParameters<M extends Method = Method> = Parameters<MethodImplementation<M>>;
 
 export type CreateMockedObserverOptions<M extends Method = Method> = {
   /** Метод который нужно протестировать */
@@ -50,12 +51,17 @@ export function createObserverWithMethod<M extends Method>(
   };
 }
 
-export function getArgumentsForMethod<M extends Method>(method: M) {
+export function callMethod<M extends Method>(
+  multicast: MulticastObserver<unknown>,
+  method: M
+): MethodParameters<M> {
   if (method === 'complete') {
-    return [] as const;
+    multicast.complete();
+    return [] as MethodParameters<M>;
+  } else {
+    multicast[method]('any value');
+    return ['any value'] as MethodParameters<M>;
   }
-
-  return ['any value'] as const;
 }
 
 /**

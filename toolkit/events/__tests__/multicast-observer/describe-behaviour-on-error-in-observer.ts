@@ -3,9 +3,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { MulticastObserver } from '../../src/multicast-observer';
 
 import {
+  callMethod,
   createMockedObserver,
   createObserverWithThrowsMethod,
-  getArgumentsForMethod,
   getDefaultMulticastOptions,
   getDefaultObserveOptions,
 } from './helpers';
@@ -18,7 +18,6 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
 
   describe(`При ошибке при вызове ${methodName}`, () => {
     it(`Вызывает обработчик ${method} остальных наблюдателей с параметрами, которые были переданы в multicastObserver.${method}`, () => {
-      const params = getArgumentsForMethod(method);
       const multicast = new MulticastObserver(getDefaultMulticastOptions());
       const firstObserver = createMockedObserver();
       const secondObserver = createObserverWithThrowsMethod(options, new Error('observer error'));
@@ -27,9 +26,7 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());
       multicast.add(thirdObserver, getDefaultObserveOptions());
-      // A spread argument must either have a tuple type or be passed to a rest parameter.
-      // @ts-expect-error -- Не понимаю что от меня здесь хочет typescript
-      multicast[method](...params);
+      const params = callMethod(multicast, method);
 
       expect(firstObserver[method]).toHaveBeenCalledWith(...params);
       expect(thirdObserver[method]).toHaveBeenCalledWith(...params);
