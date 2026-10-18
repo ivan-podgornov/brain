@@ -38,7 +38,7 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
 
       multicast.add(observer);
 
-      expect(() => multicast[method]('any param')).not.toThrow();
+      expect(() => callMethod(multicast, method)).not.toThrow();
     });
 
     it('Если в конструкторе не указан onError, то ошибка не выбрасывается', () => {
@@ -48,7 +48,7 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
 
       multicast.add(observer);
 
-      expect(() => multicast[method]('any param')).not.toThrow();
+      expect(() => callMethod(multicast, method)).not.toThrow();
     });
 
     it('Если в конструкторе указан onError, то ошибка передаётся в onError', () => {
@@ -61,7 +61,7 @@ export function describeBehaviourOnErrorInObserver(options: CreateMockedObserver
       });
 
       multicast.add(observer);
-      multicast[method]('any param');
+      callMethod(multicast, method);
 
       expect(constructorOnError).toHaveBeenCalledWith(error);
     });

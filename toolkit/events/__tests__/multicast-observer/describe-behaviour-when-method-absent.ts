@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { MulticastObserver } from '../../src/multicast-observer';
 
 import {
+  callMethod,
   createMockedObserver,
   createObserverWithAbsentMethod,
   getDefaultObserveOptions,
@@ -24,7 +25,7 @@ export function describeBehaviourWhenMethodAbsent(options: CreateMockedObserverO
 
       multicast.add(observer, getDefaultObserveOptions());
 
-      expect(() => multicast[method]('any param')).not.toThrow();
+      expect(() => callMethod(multicast, method)).not.toThrow();
     });
 
     it(`Вызываются обработчики ${method} остальных наблюдателей`, () => {
@@ -36,7 +37,7 @@ export function describeBehaviourWhenMethodAbsent(options: CreateMockedObserverO
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());
       multicast.add(thirdObserver, getDefaultObserveOptions());
-      multicast[method]('any value');
+      callMethod(multicast, method);
 
       expect(firstObserver[method]).toHaveBeenCalled();
       expect(thirdObserver[method]).toHaveBeenCalled();

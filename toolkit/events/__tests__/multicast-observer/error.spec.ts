@@ -5,6 +5,7 @@ import { MulticastObserver } from '../../src/multicast-observer';
 import { describeBehaviourOnErrorInObserver } from './describe-behaviour-on-error-in-observer';
 import { describeBehaviourWhenMethodAbsent } from './describe-behaviour-when-method-absent';
 import { describeRecallObserver } from './describe-recall-observers';
+import { describeSignalFinish } from './describe-signal-finish';
 
 import {
   createMockedObserver,
@@ -18,6 +19,7 @@ describe('MulticastObserver', () => {
     describeBehaviourOnErrorInObserver({ method: 'error' });
     describeBehaviourWhenMethodAbsent({ method: 'error', observerAsFunction: false });
     describeBehaviourWhenMethodAbsent({ method: 'error', observerAsFunction: true });
+    describeSignalFinish({ method: 'error', reason: 'subscriber failed' });
 
     describe('При отсутствии error в наблюдателях - взаимодействие с onError в конструкторе', () => {
       it('Если один из добавленных наблюдателей является функцией и в конструкторе указан onError, то ошибка уходит в onError', () => {

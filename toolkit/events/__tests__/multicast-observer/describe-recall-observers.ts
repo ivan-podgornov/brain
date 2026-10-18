@@ -14,6 +14,9 @@ import {
   getDefaultObserveOptions,
 } from './helpers';
 
+// Методы, после вызова которых вещание завершается и наблюдатели больше ничего не получают
+const FINISH_METHODS = ['complete', 'error'] as const;
+
 function getTitle(options: CreateMockedObserverOptions) {
   if (options.method === 'next' && options.observerAsFunction) {
     return 'При наблюдателе, заданном в виде функции';
@@ -51,7 +54,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
 
       multicast.add(firstObserver, getDefaultObserveOptions());
       multicast.add(secondObserver, getDefaultObserveOptions());
-      multicast[options.method]('any param');
+      callMethod(multicast, method);
 
       expect(firstImplementation).toHaveBeenCalledBefore(secondImplementation);
     });
@@ -72,7 +75,6 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       const observerThatWillBeAborted = createObserverWithMethod(options, () => {});
       const observer = createMockedObserver();
       const multicast = new MulticastObserver(getDefaultMulticastOptions());
-      const param = 'any param';
 
       multicast.add(observer, getDefaultObserveOptions());
       multicast.add(observerThatWillBeAborted, {
@@ -80,7 +82,7 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
         signal: abortController.signal,
       });
       abortController.abort();
-      multicast[method](param);
+      callMethod(multicast, method);
 
       expect(observer[method]).toHaveBeenCalled();
     });
@@ -138,6 +140,22 @@ export function describeRecallObserver(options: CreateMockedObserverOptions) {
       callMethod(multicast, method);
 
       expect(methodImplementation).not.toHaveBeenCalled();
+    });
+
+    describe.each(FINISH_METHODS)('При вызове после %s', (finishMethod) => {
+      it(`${methodName} не вызывается`, () => {
+        const methodImplementation = vi.fn();
+        const observer = createObserverWithMethod(options, methodImplementation);
+        const multicast = new MulticastObserver(getDefaultMulticastOptions());
+
+        multicast.add(observer, getDefaultObserveOptions());
+        callMethod(multicast, finishMethod);
+        // Если finishMethod совпадает с method, то наблюдатель уже был вызван при завершении
+        methodImplementation.mockClear();
+        callMethod(multicast, method);
+
+        expect(methodImplementation).not.toHaveBeenCalled();
+      });
     });
   });
 }

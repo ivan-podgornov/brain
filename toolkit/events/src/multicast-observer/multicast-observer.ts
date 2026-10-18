@@ -1,5 +1,5 @@
 import { AbortController } from '../abort-controller';
-import type { IAbortSignal } from '../abort-signal';
+import { AbortSignal, type IAbortSignal } from '../abort-signal';
 import { EventTarget } from '../event-target';
 import type { IEventTarget, ListenerOptions } from '../event-target';
 import { normalizeObserver } from '../subscriber';
@@ -41,18 +41,25 @@ export class MulticastObserver<T> implements IObserverObject<T> {
    * @param options - параметры наблюдения
    */
   add(observer?: IObserver<T>, options: ObserveOptions = {}) {
-    const normalizedObserver = normalizeObserver({ onError: this.onError }, observer);
-    const signal = options.signal ?? new AbortController().signal;
-    const listenerOptions: ListenerOptions = { signal };
-
     this.observersCount += 1;
+    const normalizedObserver = normalizeObserver({ onError: this.onError }, observer);
 
-    if (signal.aborted) {
-      this.onSignalAborted(signal);
-      return;
+    const signals: IAbortSignal[] = [this.signal];
+
+    if (options.signal) {
+      const { signal } = options;
+      signals.push(signal);
+      signal.addEventListener('abort', () => this.onSignalAborted(signal), {
+        once: true,
+        signal: this.signal,
+      });
+
+      if (signal.aborted) {
+        this.onSignalAborted(signal);
+      }
     }
 
-    signal.addEventListener('abort', () => this.onSignalAborted(signal), { once: true });
+    const listenerOptions: ListenerOptions = { signal: AbortSignal.any(signals) };
 
     this.eventTarget.addEventListener(
       'next',
@@ -75,10 +82,12 @@ export class MulticastObserver<T> implements IObserverObject<T> {
 
   error(error?: unknown) {
     this.eventTarget.dispatchEvent('error', error);
+    this.abortController.abort('subscriber failed');
   }
 
   complete() {
     this.eventTarget.dispatchEvent('complete');
+    this.abortController.abort('subscriber success');
   }
 
   next(value: T) {
