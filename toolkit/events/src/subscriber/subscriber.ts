@@ -1,14 +1,15 @@
 import { AbortController } from '../abort-controller';
 import type { IAbortSignal } from '../abort-signal';
 
-import type { ISubscriber, IObserver, TeardownCallback, IObserverObject } from './types';
+import { normalizeObserver } from './normalize-observer';
+import type { NormalizedObserver } from './normalize-observer';
+import type { ISubscriber, IObserver, TeardownCallback } from './types';
 
 export type SubscriberConstructorOptions = {
   signal?: IAbortSignal;
   onError?: (error?: unknown) => void;
 };
 
-type NormalizedObserver<T> = Required<IObserverObject<T>>;
 type CallObserver = () => void;
 
 function noop() {}
@@ -23,9 +24,7 @@ export class Subscriber<T> implements ISubscriber<T> {
 
   constructor(observer?: IObserver<T>, options: SubscriberConstructorOptions = {}) {
     this.onError = options.onError ?? noop;
-    // normalizeObserver рассчитывает, что на момент его вызова, onError уже добавлен в this.
-    // Так что порядок инициализации onError и observer должны быть именно такими
-    this.observer = this.normalizeObserver(observer);
+    this.observer = normalizeObserver({ onError: this.onError }, observer);
 
     this.abortController = new AbortController();
     this.teardowns = [];
@@ -66,37 +65,6 @@ export class Subscriber<T> implements ISubscriber<T> {
     } catch (error) {
       this.onError(error);
     }
-  }
-
-  /** Приводит переданный observer к одному формату, когда observer является объектом со всеми методами */
-  private normalizeObserver(observer?: IObserver<T>): NormalizedObserver<T> {
-    const defaultObserver: NormalizedObserver<T> = {
-      next: noop,
-      error: this.onError,
-      complete: noop,
-    };
-
-    if (!observer) {
-      return defaultObserver;
-    }
-
-    if (typeof observer === 'function') {
-      return { ...defaultObserver, next: observer };
-    }
-
-    return {
-      ...defaultObserver,
-      next:
-        typeof observer.next === 'function' ? observer.next.bind(observer) : defaultObserver.next,
-      complete:
-        typeof observer.complete === 'function'
-          ? observer.complete.bind(observer)
-          : defaultObserver.complete,
-      error:
-        typeof observer.error === 'function'
-          ? observer.error.bind(observer)
-          : defaultObserver.error,
-    };
   }
 
   /**

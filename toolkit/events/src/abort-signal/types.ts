@@ -1,7 +1,7 @@
 import type { Listener, IEventTarget } from '../event-target';
 
 export type AbortSignalEvents = {
-  abort?: unknown;
+  abort: [reason?: unknown];
 };
 
 export type Abort = (reason?: unknown) => void;
