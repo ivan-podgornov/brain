@@ -1,5 +1,5 @@
 import { Listeners } from './listeners';
-import type { DefaultEvents, EventPayload, IEventTarget, Listener, ListenerOptions } from './types';
+import type { EventMap, IEventTarget, Listener, ListenerOptions } from './types';
 
 type ErrorHandler = (error: unknown) => void;
 
@@ -11,7 +11,7 @@ const DEFAULT_LISTENER_OPTIONS: ListenerOptions = {
   once: false,
 };
 
-export class EventTarget<Events extends DefaultEvents> implements IEventTarget<Events> {
+export class EventTarget<Events extends EventMap<Events>> implements IEventTarget<Events> {
   private readonly listeners: Listeners<Events> = new Listeners();
   private readonly onError: ErrorHandler;
 
@@ -19,7 +19,7 @@ export class EventTarget<Events extends DefaultEvents> implements IEventTarget<E
     this.onError = options.onError ?? (() => {});
   }
 
-  dispatchEvent<K extends keyof Events>(type: K, ...payload: EventPayload<Events[K]>): void {
+  dispatchEvent<K extends keyof Events>(type: K, ...payload: Events[K]): void {
     this.listeners.forEach(type, (listener, options) => {
       try {
         if (options.once) {

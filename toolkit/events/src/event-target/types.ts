@@ -1,10 +1,10 @@
-export type DefaultEvents = object;
+export type EventArgs = [payload?: unknown];
 
-export type EventPayload<T> = [T] extends [undefined] ? [] : [payload: T];
+export type EventMap<Events> = { [K in keyof Events]: EventArgs };
 
-export type Listener<T> = (...payload: EventPayload<T>) => void;
+export type Listener<Args extends EventArgs> = (...payload: Args) => void;
 
-export interface IAbortSignal extends IEventTarget<{ abort?: unknown }> {
+export interface IAbortSignal extends IEventTarget<{ abort: [reason?: unknown] }> {
   aborted: boolean;
 }
 
@@ -23,13 +23,13 @@ export type ListenerOptions = {
   signal?: IAbortSignal;
 };
 
-export interface IEventTarget<Events extends DefaultEvents> {
+export interface IEventTarget<Events extends EventMap<Events>> {
   /**
    * Генерирует событие на объекте-эмиттере
    * @param type - название события
    * @param payload - параметры события
    */
-  dispatchEvent<K extends keyof Events>(type: K, ...payload: EventPayload<Events[K]>): void;
+  dispatchEvent<K extends keyof Events>(type: K, ...payload: Events[K]): void;
 
   /**
    * Назначает обработчик на объект-эмиттер. Обработчик будет вызываться при генерации события

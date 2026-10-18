@@ -18,7 +18,7 @@ describe('EventTarget', () => {
     });
 
     it('Назначает обработчик на событие, название которого совпадает со свойством объектов', () => {
-      const target = new EventTarget<{ constructor: never }>();
+      const target = new EventTarget<{ constructor: [] }>();
       const listener = vi.fn();
 
       target.addEventListener('constructor', listener);

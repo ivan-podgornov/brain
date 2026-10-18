@@ -12,7 +12,7 @@
 import { EventTarget } from '@brain/events';
 
 type Events = {
-  npcDied: number;
+  npcDied: [id: number];
 };
 
 const target = new EventTarget<Events>();
@@ -44,19 +44,19 @@ target.removeEventListener('npcDied', onNpcDied);
 
 ```ts
 type Events = {
-  npcDied: number;
+  npcDied: [id: number];
 };
 
 target.dispatchEvent('npcDied', 42); // ok
 target.dispatchEvent('npcDied'); // ошибка: данные обязательны
 ```
 
-Если данных нет, укажите `undefined`.
+Если данных нет, укажите пустой кортеж.
 Тогда второй параметр не нужен, а обработчик не принимает аргументов:
 
 ```ts
 type Events = {
-  tick: undefined;
+  tick: [];
 };
 
 target.addEventListener('tick', () => console.log('тик'));
@@ -67,7 +67,7 @@ target.dispatchEvent('tick');
 
 ```ts
 type Events = {
-  npcMoved: { id: number; x: number; y: number };
+  npcMoved: [{ id: number; x: number; y: number }];
 };
 
 target.dispatchEvent('npcMoved', { id: 1, x: 10, y: 20 });

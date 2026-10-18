@@ -8,12 +8,12 @@ export const optionsCases = [
 ] as const;
 
 export type TestEvents = {
-  tick: undefined;
-  update: number;
+  tick: [];
+  update: [count: number];
 };
 
 export function createMockedAbortSignal(aborted: boolean): IAbortSignal {
-  const target = new EventTarget<{ abort: 'unknown' }>();
+  const target = new EventTarget<{ abort: [reason?: unknown] }>();
 
   return {
     aborted,
