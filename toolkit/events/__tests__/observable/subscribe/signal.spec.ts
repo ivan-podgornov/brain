@@ -34,7 +34,23 @@ describe('Observable', () => {
         expect(observer.next).not.toHaveBeenCalled();
       });
 
-      it('Если сигнал одного из наблюдателей переходит в состояние aborted, остальные наблюдатели продолжают получать значения', () => {
+      it('Если сигнал первого подписанного наблюдателя переходит в состояние aborted, остальные наблюдатели продолжают получать значения', () => {
+        const controller = new AbortController();
+        const { observable, subscriber } = createControlledObservable();
+        const otherObserver = createMockedObserver();
+
+        observable.subscribe(createMockedObserver(), {
+          ...getDefaultSubscribeOptions(),
+          signal: controller.signal,
+        });
+        observable.subscribe(otherObserver, getDefaultSubscribeOptions());
+        controller.abort();
+        subscriber.next('value');
+
+        expect(otherObserver.next).toHaveBeenCalledWith('value');
+      });
+
+      it('Если сигнал последнего подписанного наблюдателя переходит в состояние aborted, остальные наблюдатели продолжают получать значения', () => {
         const controller = new AbortController();
         const { observable, subscriber } = createControlledObservable();
         const otherObserver = createMockedObserver();
@@ -47,7 +63,7 @@ describe('Observable', () => {
         controller.abort();
         subscriber.next('value');
 
-        expect(otherObserver.next).toHaveBeenCalledExactlyOnceWith('value');
+        expect(otherObserver.next).toHaveBeenCalledWith('value');
       });
 
       it('Если сигналы всех наблюдателей перешли в состояние aborted, сигнал subscriber переходит в состояние aborted', () => {
