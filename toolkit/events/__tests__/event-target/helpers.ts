@@ -1,4 +1,4 @@
-import { EventTarget } from '../../src/event-target';
+import { EventTarget } from '../../src';
 import type { IAbortSignal } from '../../src/event-target/types';
 
 export const optionsCases = [
@@ -20,5 +20,6 @@ export function createMockedAbortSignal(aborted: boolean): IAbortSignal {
     addEventListener: target.addEventListener.bind(target),
     removeEventListener: target.removeEventListener.bind(target),
     dispatchEvent: target.dispatchEvent.bind(target),
+    when: target.when.bind(target),
   };
 }

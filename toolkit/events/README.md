@@ -8,6 +8,7 @@
 - [`EventTarget`](./docs/event-target.md) — типизированный эмиттер событий.
 - [`AbortController`](./docs/abort-controller.md) — позволяет прервать асинхронную операцию.
 - [`AbortSignal`](./docs/abort-signal.md) — сообщает операции, что её нужно прервать.
+- [`Observable`](./docs/observable.md) - абстракция для работы с потоками данных.
 
 ## Быстрый старт
 
