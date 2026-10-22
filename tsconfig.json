@@ -16,7 +16,8 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["@typescript-to-lua/language-extensions"]
   },
   "exclude": ["node_modules", "dist"],
   "include": ["eslint.config.js", "./toolkit/**/*", "./core/**/*", "./mod/**/*"]
