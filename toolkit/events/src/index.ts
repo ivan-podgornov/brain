@@ -1,3 +1,5 @@
+import './observable/when-patch';
+
 export * from './abort-controller';
 
 export * from './abort-signal';
