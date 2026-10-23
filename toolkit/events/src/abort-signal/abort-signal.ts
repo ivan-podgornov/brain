@@ -110,7 +110,6 @@ export class AbortSignal extends EventTarget<AbortSignalEvents> implements IAbor
     const reason = new Error('signal timed out');
     reason.name = 'TimeoutError';
 
-    // @ts-expect-error -- ожидаем, что таймаут объявлен в глобальной области видимости
     return new AbortSignal((abort) => setTimeout(abort, ms, reason));
   }
 }
