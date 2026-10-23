@@ -1,4 +1,4 @@
-import type { PedHandle, VehicleHandle } from './handles';
+import type { ObjectHandle, PedHandle, VehicleHandle } from './handles';
 
 /**
  * Интерфейс функций для работы с персонажами в MoonLoader
@@ -169,6 +169,14 @@ interface CharGlobal {
     approachAngle: number
   ): void;
 
+  taskGoToObject(
+    this: void,
+    ped: PedHandle,
+    object: ObjectHandle,
+    timeLimit: number,
+    stopWithinRadius: number
+  ): void;
+
   /** Заставляет персонажа следовать за целью */
   taskFollowPathNodesToCoord(
     this: void,
@@ -327,6 +335,7 @@ export const {
   taskGoToCoordAnyMeans,
   taskGoStraightToCoord,
   taskGotoChar,
+  taskGoToObject,
   taskGotoCharAiming,
   taskGotoCharOffset,
   taskFollowPathNodesToCoord,

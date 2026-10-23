@@ -64,6 +64,9 @@ interface ObjectGlobal {
     collision: boolean
   ): void;
 
+  /** Устанавливает коллизию определенному объекту */
+  setObjectCollision(this: void, obj: ObjectHandle, collision: boolean): void;
+
   /** Устанавливает видимость объекта */
   setObjectVisible(this: void, obj: ObjectHandle, visible: boolean): void;
 
@@ -99,6 +102,7 @@ export const {
   attachObjectToCar,
   attachObjectToChar,
   detachObject,
+  setObjectCollision,
   setObjectVisible,
   setObjectDynamic,
   setObjectProofs,

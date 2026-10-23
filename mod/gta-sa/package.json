@@ -1,0 +1,13 @@
+{
+  "name": "@brain/gta-sa",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "dependencies": {
+    "@brain/events": "0.0.0",
+    "@brain/game": "0.0.0",
+    "@brain/geometry": "0.0.0",
+    "@brain/moonloader": "0.0.0"
+  }
+}
