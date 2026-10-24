@@ -20,5 +20,5 @@
     "types": ["@typescript-to-lua/language-extensions"]
   },
   "exclude": ["node_modules", "dist"],
-  "include": ["eslint.config.js", "./global.d.ts", "./toolkit/**/*", "./core/**/*", "./mod/**/*"]
+  "include": ["eslint.config.js", "mod/mod/_G.d.ts", "./toolkit/**/*", "./core/**/*", "./mod/**/*"]
 }

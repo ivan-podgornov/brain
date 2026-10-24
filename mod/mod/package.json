@@ -1,0 +1,17 @@
+{
+  "name": "@brain/mod",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tstl -p ./tsconfig.build.json"
+  },
+  "dependencies": {
+    "@brain/gta-sa": "0.0.0",
+    "@brain/moonloader": "0.0.0",
+    "@brain/world": "0.0.0"
+  },
+  "devDependencies": {
+    "typescript-to-lua": "^1.37.1"
+  }
+}

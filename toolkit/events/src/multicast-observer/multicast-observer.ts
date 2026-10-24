@@ -42,7 +42,12 @@ export class MulticastObserver<T> implements IObserverObject<T> {
    */
   add(observer?: IObserver<T>, options: ObserveOptions = {}) {
     this.observersCount += 1;
-    const normalizedObserver = normalizeObserver({ onError: this.onError }, observer);
+    const normalizedObserver = normalizeObserver(
+      {
+        onError: (error?: unknown) => this.onError(error),
+      },
+      observer
+    );
 
     const signals: IAbortSignal[] = [this.signal];
 
