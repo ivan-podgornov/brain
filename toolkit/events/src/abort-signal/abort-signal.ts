@@ -21,7 +21,7 @@ export class AbortSignal extends EventTarget<AbortSignalEvents> implements IAbor
     super();
     this.state = new PendingState();
     this.onabort = null;
-    executor(this.toAbort.bind(this));
+    executor((...args) => this.toAbort(...args));
 
     this.addEventListener('abort', (reason) => {
       if (this.onabort) {

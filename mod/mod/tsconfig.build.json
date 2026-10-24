@@ -1,0 +1,28 @@
+{
+  "$schema": "https://raw.githubusercontent.com/TypeScriptToLua/TypeScriptToLua/master/tsconfig-schema.json",
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "lib": ["ESNext"],
+    "target": "esnext",
+    "verbatimModuleSyntax": false,
+    "paths": {
+      "@brain/game": ["../../core/game/src/index.ts"],
+      "@brain/world": ["../../core/world/src/index.ts"],
+      "@brain/gta-sa": ["../gta-sa/src/index.ts"],
+      "@brain/moonloader": ["../moonloader/src/index.ts"],
+      "vkeys": ["../moonloader/src/vkeys.ts"],
+      "@brain/events": ["../../toolkit/events/src/index.ts"],
+      "@brain/geometry": ["../../toolkit/geometry/src/index.ts"],
+      "@brain/htn": ["../../toolkit/htn/src/index.ts"]
+    }
+  },
+  "tstl": {
+    "luaBundle": "./dist/brain.lua",
+    "luaBundleEntry": "./src/main.ts",
+    "luaTarget": "JIT",
+    "noImplicitSelf": true,
+    "noResolvePaths": ["vkeys"]
+  },
+  "include": ["./_G.d.ts", "./src/**/*.ts"]
+}
